@@ -1,17 +1,11 @@
 import {
   AccessTimeOutlined,
-  AlignHorizontalLeft,
+  ChatSharp,
   DocumentScanner,
-  Face2Rounded,
   Face5Outlined,
-  FavoriteBorderOutlined,
   FormatAlignLeft,
-  LockClockOutlined,
   MoreVertOutlined,
-  PunchClockOutlined,
   Send,
-  ShareOutlined,
-  Task,
   Verified,
 } from "@mui/icons-material";
 import {
@@ -22,13 +16,9 @@ import {
   CardActions,
   CardContent,
   CardHeader,
-  Collapse,
   Icon,
   IconButton,
   LinearProgress,
-  ListItem,
-  ListItemAvatar,
-  ListItemText,
   Stack,
   TextField,
   Toolbar,
@@ -38,7 +28,7 @@ import { red } from "@mui/material/colors";
 
 function ActivityItem({ activity }: { activity: Activity }) {
   return (
-    <Card variant="outlined">
+    <Card variant="outlined" sx={{ m: 2 }}>
       <CardHeader
         avatar={
           <Avatar sx={{ bgcolor: red[500] }} aria-label="recipe">
@@ -58,93 +48,97 @@ function ActivityItem({ activity }: { activity: Activity }) {
           {activity.content}
         </Typography>
       </CardContent>
-      <CardActions disableSpacing>
-        {/* <ExpandMore
-          expand={expanded}
-          onClick={handleExpandClick}
-          aria-expanded={expanded}
-          aria-label="show more"
-        >
-          <ExpandMoreIcon />
-        </ExpandMore> */}
-      </CardActions>
-      {/* <Collapse in={expanded} timeout="auto" unmountOnExit>
-        <CardContent>
-          <Typography sx={{ marginBottom: 2 }}>Method:</Typography>
-          <Typography sx={{ marginBottom: 2 }}>
-            Heat 1/2 cup of the broth in a pot until simmering, add saffron and set
-            aside for 10 minutes.
-          </Typography>
-          <Typography sx={{ marginBottom: 2 }}>
-            Heat oil in a (14- to 16-inch) paella pan or a large, deep skillet over
-            medium-high heat. Add chicken, shrimp and chorizo, and cook, stirring
-            occasionally until lightly browned, 6 to 8 minutes. Transfer shrimp to a
-            large plate and set aside, leaving chicken and chorizo in the pan. Add
-            pimentón, bay leaves, garlic, tomatoes, onion, salt and pepper, and cook,
-            stirring often until thickened and fragrant, about 10 minutes. Add
-            saffron broth and remaining 4 1/2 cups chicken broth; bring to a boil.
-          </Typography>
-          <Typography sx={{ marginBottom: 2 }}>
-            Add rice and stir very gently to distribute. Top with artichokes and
-            peppers, and cook without stirring, until most of the liquid is absorbed,
-            15 to 18 minutes. Reduce heat to medium-low, add reserved shrimp and
-            mussels, tucking them down into the rice, and cook again without
-            stirring, until mussels have opened and rice is just tender, 5 to 7
-            minutes more. (Discard any mussels that don&apos;t open.)
-          </Typography>
-          <Typography>
-            Set aside off of the heat to let rest for 10 minutes, and then serve.
-          </Typography>
-        </CardContent>
-      </Collapse> */}
+      <CardActions disableSpacing></CardActions>
     </Card>
   );
 }
 
 function ActivityBox({ activities }: { activities: Activity[] }) {
   return (
-    <>
-      <Typography variant="h6">Activities</Typography>
+    <Box sx={{ m: 2 }}>
+      <Stack direction="row" spacing={2} alignItems={"flex-start"}>
+        <ChatSharp fontSize="large" />
+        <Typography variant="subtitle1">Activities</Typography>
+      </Stack>
+      <Stack direction="row" spacing={2} alignItems={"center"} sx={{ m: 1 }}/>
       <Stack spacing={2}>
         {activities.map((activity) => (
           <ActivityItem key={activity.id} activity={activity} />
         ))}
       </Stack>
-    </>
+    </Box>
   );
 }
 
 function TaskDetail({ task }: { task: Task }) {
+  const getProgressColor = (progress: number) => {
+    if (progress < 0.3) return "var(--progress-low)"; // Low progress color
+    if (progress < 0.7) return "var(--progress-medium)"; // Medium progress color
+    return "var(--progress-high)"; // High progress color
+  };
   return (
-    <Stack>
-      <Typography variant="h2">{task.name}</Typography>
+    <Box sx={{ m: 2 }}>
+      <Typography
+        sx={{
+          mt: 2,
+          mb: 2,
+          color: "var(--primary-color)",
+        }}
+        variant="h4"
+      >
+        {task.name}
+      </Typography>
+
       <Stack direction="row" spacing={2} alignItems={"flex-start"}>
-          <FormatAlignLeft fontSize="large"/>
-        <Card variant="outlined">
+        <FormatAlignLeft fontSize="large" />
+        <Card
+          sx={{
+            position: "relative",
+            width: "100%",
+            whiteSpace: "pre-wrap",
+            wordWrap: "break-word",
+            overflowWrap: "break-word",
+            m: 2,
+          }}
+          variant="outlined"
+        >
           <CardContent>{task.description}</CardContent>
         </Card>
       </Stack>
-      <Stack direction="row" spacing={2} alignItems="center">
-          <AccessTimeOutlined fontSize="large"/>
+      <Stack direction="row" spacing={2} alignItems="center" sx={{ m: 2 }}>
+        <AccessTimeOutlined fontSize="large" />
         <Typography variant="body1">{task.deadline}</Typography>
       </Stack>
-      <Stack direction="row" spacing={2} alignItems={"center"}>
-          <Face5Outlined fontSize="large"/>
+      <Stack direction="row" spacing={2} alignItems={"center"} sx={{ m: 2 }}>
+        <Face5Outlined fontSize="large" />
         <Typography variant="body1">{task.assignee}</Typography>
       </Stack>
-      <Stack direction="row" spacing={2} alignItems={"center"}>
-        <Verified fontSize="large"/>
-        <Typography variant="h6">Objective</Typography>
-        </Stack>
-    <LinearProgress variant="determinate" value={task.progress * 100} />
+      <Stack direction="row" spacing={2} alignItems={"center"} sx={{ m: 2 }}>
+        <Verified fontSize="large" />
+        <Typography variant="subtitle1">Objective</Typography>
+      </Stack>
+      <Box sx={{ m: 2 }}>
+        <LinearProgress
+          variant="determinate"
+          value={task.progress * 100}
+          sx={{
+            bgcolor: "var(--progress-background)",
+            height: 20,
+            borderRadius: 5,
+            "& .MuiLinearProgress-bar": {
+              bgcolor: getProgressColor(task.progress),
+            },
+          }}
+        />
+      </Box>
       <ActivityBox activities={task.activities} />
-    </Stack>
+    </Box>
   );
 }
 
 function BottomBar() {
   return (
-    <AppBar position="fixed" sx={{ top: "auto", bottom: 0 }}>
+    <AppBar position="fixed" sx={{ top: "auto", bottom: 0, bgcolor: "primary.main" }}>
       <Toolbar>
         <Icon>
           <Face5Outlined />
@@ -156,8 +150,8 @@ function BottomBar() {
           id="filled-hidden-label-small"
           variant="filled"
           size="small"
+          sx={{ flexGrow: 1, m: 2 }}
         />
-        <Box sx={{ flexGrow: 1 }} />
         <IconButton>
           <DocumentScanner />
         </IconButton>
@@ -171,13 +165,13 @@ function BottomBar() {
 
 export default function Page({ params }: { params: Promise<{ id: string }> }) {
   return (
-    <>
+    <Box>
       <TaskDetail
         task={{
           id: 1,
-          name: "hello",
-          description: "longText",
-          progress: 0.5,
+          name: "My Task",
+          description: "Some description",
+          progress: 0.7,
           deadline: "10/2/2024",
           assignee: "LTP",
           activities: [
@@ -187,6 +181,6 @@ export default function Page({ params }: { params: Promise<{ id: string }> }) {
         }}
       />
       <BottomBar />
-    </>
+    </Box>
   );
 }
