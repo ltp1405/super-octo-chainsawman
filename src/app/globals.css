@@ -1,6 +1,46 @@
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --background-color: #e8f5f9; /* Soft teal for a soothing background */
+  --text-color: #1e293b; /* Muted navy for easy readability */
+  --primary-color: #626cfa; /* Bright cyan for primary accents */
+  --secondary-color: #9c85e7; /* Vibrant teal for secondary accents */
+  --border-color: #cbd5e1; /* Light steel gray for subtle borders */
+  --card-background: #ffffff; /* Clean white for cards */
+  --button-hover: #0284c7; /* Slightly darker cyan for hover effects */
+
+  --progress-low: rgba(255, 69, 58, 0.7); /* Red for low progress */
+  --progress-medium: rgba(255, 214, 10, 0.7); /* Yellow for medium progress */
+  --progress-high: rgba(76, 217, 100, 0.7); /* Green for high progress */
+
+  --shadow-color: rgba(0, 0, 0, 0.1);
+}
+
+[data-theme='dark'] {
+  --background-color: #0f172a; /* Deep navy for a calming dark theme */
+  --text-color: #e2e8f0; /* Light steel gray for contrast */
+  --primary-color: #a6b3ff; /* Bright cyan for primary accents */
+  --secondary-color: #3299ff; /* Vibrant teal for secondary accents */
+  --border-color: #1e293b; /* Dark navy for borders */
+  --card-background: #1e293b; /* Muted navy for cards */
+  --button-hover: #0369a1; /* Muted cyan for hover effects */
+
+  --progress-low: rgba(204, 68, 51, 0.7); /* Dark red for low progress */
+  --progress-medium: rgba(255, 193, 7, 0.7); /* Gold for medium progress */
+  --progress-high: rgba(38, 166, 91, 0.7); /* Dark green for high progress */
+
+  --shadow-color: rgba(0, 0, 0, 0.3);
+}
+
+body {
+  background-color: var(--background-color);
+  color: var(--text-color);
+  margin: 0;
+  font-family: 'Roboto', sans-serif;
+}
+
+.list-item-text {
+  font-size: 1.8rem; /* Set the size for primary text */
+  font-weight: 500; /* Use a medium font weight */
+  color: var(--text-color); /* Use theme variable */
 }
 
 @media (prefers-color-scheme: dark) {
@@ -14,14 +54,7 @@ html,
 body {
   max-width: 100vw;
   overflow-x: hidden;
-}
-
-body {
-  color: var(--foreground);
-  background: var(--background);
-  font-family: Arial, Helvetica, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
+  font-family: 'Roboto', sans-serif;
 }
 
 * {
