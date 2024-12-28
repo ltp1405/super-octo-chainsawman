@@ -1,3 +1,5 @@
+"use client";
+
 import {
   AccessTimeOutlined,
   ChatSharp,
@@ -6,52 +8,36 @@ import {
   FormatAlignLeft,
   MoreVertOutlined,
   Send,
+  Task,
   Verified,
 } from "@mui/icons-material";
 import {
   AppBar,
   Avatar,
   Box,
+  Button,
   Card,
   CardActions,
   CardContent,
   CardHeader,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogTitle,
   Icon,
   IconButton,
   LinearProgress,
+  Modal,
   Stack,
   TextField,
   Toolbar,
   Typography,
 } from "@mui/material";
 import { red } from "@mui/material/colors";
-
-function ActivityItem({ activity }: { activity: Activity }) {
-  return (
-    <Card variant="outlined" sx={{ m: 2 }}>
-      <CardHeader
-        avatar={
-          <Avatar sx={{ bgcolor: red[500] }} aria-label="recipe">
-            {activity.author[0]}
-          </Avatar>
-        }
-        action={
-          <IconButton aria-label="settings">
-            <MoreVertOutlined />
-          </IconButton>
-        }
-        title={activity.author}
-        subheader={activity.created_at}
-      />
-      <CardContent>
-        <Typography variant="body2" sx={{ color: "text.secondary" }}>
-          {activity.content}
-        </Typography>
-      </CardContent>
-      <CardActions disableSpacing></CardActions>
-    </Card>
-  );
-}
+import React, { useEffect } from "react";
+import TaskReportForm from "./_component/task-report";
+import ActivityCard from "./_component/activity-card";
+import { Activity, ActivityType } from "@/data/activity";
 
 function ActivityBox({ activities }: { activities: Activity[] }) {
   return (
@@ -60,10 +46,10 @@ function ActivityBox({ activities }: { activities: Activity[] }) {
         <ChatSharp fontSize="large" />
         <Typography variant="subtitle1">Activities</Typography>
       </Stack>
-      <Stack direction="row" spacing={2} alignItems={"center"} sx={{ m: 1 }}/>
+      <Stack direction="row" spacing={2} alignItems={"center"} sx={{ m: 1 }} />
       <Stack spacing={2}>
         {activities.map((activity) => (
-          <ActivityItem key={activity.id} activity={activity} />
+          <ActivityCard key={activity.id} activity={activity} />
         ))}
       </Stack>
     </Box>
@@ -136,51 +122,214 @@ function TaskDetail({ task }: { task: Task }) {
   );
 }
 
-function BottomBar() {
+const style = {
+  position: "absolute",
+  top: "50%",
+  left: "50%",
+  Ptransform: "translate(-50%, -50%)",
+  width: 400,
+  bgcolor: "background.paper",
+  border: "2px solid #000",
+  boxShadow: 24,
+  p: 4,
+};
+
+function BasicModal({
+  open,
+  handleClose,
+  handleSubmit,
+}: {
+  open: boolean;
+  handleClose: () => void;
+  handleSubmit: (value: string) => void;
+}) {
   return (
-    <AppBar position="fixed" sx={{ top: "auto", bottom: 0, bgcolor: "primary.main" }}>
-      <Toolbar>
-        <Icon>
-          <Face5Outlined />
-        </Icon>
-        <TextField
-          hiddenLabel
-          placeholder="Add a comment"
-          multiline
-          id="filled-hidden-label-small"
-          variant="filled"
-          size="small"
-          sx={{ flexGrow: 1, m: 2 }}
-        />
-        <IconButton>
-          <DocumentScanner />
-        </IconButton>
-        <IconButton>
-          <Send />
-        </IconButton>
-      </Toolbar>
+    <div>
+      <Dialog
+        open={open}
+        onClose={handleClose}
+        PaperProps={{
+          component: "form",
+          onSubmit: (event: React.FormEvent<HTMLFormElement>) => {
+            event.preventDefault();
+            const formData = new FormData(event.currentTarget);
+            const formJson = Object.fromEntries((formData as any).entries());
+            const report = formJson.report;
+            handleSubmit(report);
+            handleClose();
+          },
+        }}
+        aria-labelledby="modal-modal-title"
+        aria-describedby="modal-modal-description"
+      >
+        <DialogTitle id="modal-modal-title">Report</DialogTitle>
+        <DialogContent>
+          <TextField name="report" fullWidth label="How much" type="number" />
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleClose}>Cancel</Button>
+          <Button type="submit">Submit</Button>
+        </DialogActions>
+      </Dialog>
+    </div>
+  );
+}
+
+function BottomBar({
+  onReportClick,
+  onMessageSend,
+}: {
+  onReportClick: () => void;
+  onMessageSend: (data: string) => void;
+}) {
+  return (
+    <AppBar
+      position="fixed"
+      sx={{ top: "auto", bottom: 0, bgcolor: "primary.main" }}
+    >
+      <form
+        onSubmit={(event: React.FormEvent<HTMLFormElement>) => {
+          event.preventDefault();
+          const formData = new FormData(event.currentTarget);
+          const formJson = Object.fromEntries((formData as any).entries());
+          const message = formJson.message;
+          onMessageSend(message);
+        }}
+      >
+        <Toolbar>
+          <Icon>
+            <Face5Outlined />
+          </Icon>
+          <TextField
+            hiddenLabel
+            placeholder="Add a comment"
+            multiline
+            name="message"
+            id="filled-hidden-label-small"
+            variant="filled"
+            size="small"
+            sx={{ flexGrow: 1, m: 2 }}
+          />
+          <IconButton onClick={onReportClick}>
+            <DocumentScanner />
+          </IconButton>
+          <IconButton type="submit">
+            <Send />
+          </IconButton>
+        </Toolbar>
+      </form>
     </AppBar>
   );
 }
 
+const initialData = {
+  id: 1,
+  name: "My Task",
+  description: "Some description",
+  progress: 0.7,
+  deadline: "10/2/2024",
+  assignee: "LTP",
+  activities: [
+    {
+      id: 1,
+      content: "activity1",
+      type: ActivityType.COMMENT,
+      author: "LTP",
+      created_at: "2024",
+    },
+    {
+      id: 2,
+      content: "activity2",
+      author: "ltp",
+      created_at: "2024",
+      type: ActivityType.COMMENT,
+    },
+    {
+      id: 5,
+      content: "report",
+      author: "ltp",
+      created_at: "2024",
+      type: ActivityType.NON_MEASURABLE_REPORT,
+    },
+    {
+      id: 4,
+      content: "report",
+      author: "ltp",
+      created_at: "2024",
+      progress: 0.5,
+      type: ActivityType.NON_MEASURABLE_REPORT,
+    },
+    {
+      id: 3,
+      content: "50",
+      author: "ltp",
+      created_at: "2024",
+      type: ActivityType.MEASURABLE_REPORT,
+    },
+  ],
+};
+
 export default function Page({ params }: { params: Promise<{ id: string }> }) {
+  const [reportFormOpen, setReportFormOpen] = React.useState(false);
+  const [data, setData] = React.useState<Task | null>(null);
+  useEffect(() => {
+    setData(initialData);
+  }, [1]);
+  const TaskDetailView = ({ task }: { task: Task | null }) => {
+    if (!task) {
+      return <div>Loading...</div>;
+    }
+    return <TaskDetail task={task} />;
+  };
   return (
-    <Box>
-      <TaskDetail
-        task={{
-          id: 1,
-          name: "My Task",
-          description: "Some description",
-          progress: 0.7,
-          deadline: "10/2/2024",
-          assignee: "LTP",
-          activities: [
-            { id: 1, content: "activity1", author: "LTP", created_at: "2024" },
-            { id: 2, content: "activity2", author: "LTP", created_at: "2024" },
-          ],
-        }}
-      />
-      <BottomBar />
-    </Box>
+    <>
+      <TaskDetailView task={data} />
+      <Box>
+        <BasicModal
+          open={reportFormOpen}
+          handleClose={() => setReportFormOpen(false)}
+          handleSubmit={(value) => {
+            if (!data) {
+              return;
+            }
+            const newActivity = {
+              id: data.activities.length + 1,
+              type: ActivityType.MEASURABLE_REPORT,
+              author: "LTP",
+              created_at: "2024",
+              content: value,
+            };
+            const newData = {
+              ...data,
+              activities: [...data.activities, newActivity],
+            };
+            setData(newData);
+          }}
+        />
+        <BottomBar
+          onReportClick={() => {
+            setReportFormOpen(true);
+          }}
+          onMessageSend={(message) => {
+            if (!data) {
+              return;
+            }
+            const newActivity = {
+              id: data.activities.length + 1,
+              author: "LTP",
+              type: ActivityType.COMMENT,
+              created_at: "2024",
+              content: message,
+            };
+            const newData = {
+              ...data,
+              activities: [...data.activities, newActivity],
+            };
+            console.log(newData);
+            setData(newData);
+          }}
+        />
+      </Box>
+    </>
   );
 }

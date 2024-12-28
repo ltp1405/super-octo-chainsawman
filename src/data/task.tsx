@@ -13,3 +13,9 @@ interface TaskOverview {
     name: string;
     progress: number;
 }
+
+interface TaskAssessOverview {
+    id: number;
+    name: string;
+    progress: number;
+}
